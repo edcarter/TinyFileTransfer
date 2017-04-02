@@ -41,7 +41,7 @@ JNIEXPORT void JNICALL Java_TEA_encrypt
   (JNIEnv *env, jclass o, jbyteArray b, jlongArray k) {
 	jboolean b_is_copy, k_is_copy;
 	jsize len = (*env)->GetArrayLength(env, b);
-    jlong *key = (*env)->GetLongArrayElements(env, k, &k_is_copy);
+	jlong *key = (*env)->GetLongArrayElements(env, k, &k_is_copy);
 	jbyte *data = (*env)->GetByteArrayElements(env, b, &b_is_copy);
 
 	long *ptr = (long *)data;
@@ -49,7 +49,7 @@ JNIEXPORT void JNICALL Java_TEA_encrypt
 		encrypt(ptr, (long *) key);
 	}
 	(*env)->ReleaseLongArrayElements(env, k, key, k_is_copy);
-    (*env)->ReleaseByteArrayElements(env, b, data, b_is_copy);
+	(*env)->ReleaseByteArrayElements(env, b, data, b_is_copy);
 }
 
 JNIEXPORT void JNICALL Java_TEA_decrypt
@@ -64,6 +64,6 @@ JNIEXPORT void JNICALL Java_TEA_decrypt
 		decrypt(ptr, (long *)key);
 	}
 	(*env)->ReleaseLongArrayElements(env, k, key, k_is_copy);
-    (*env)->ReleaseByteArrayElements(env, b, data, b_is_copy);
+	(*env)->ReleaseByteArrayElements(env, b, data, b_is_copy);
 }
 
