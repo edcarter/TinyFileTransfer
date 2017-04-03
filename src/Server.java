@@ -7,15 +7,15 @@ import java.util.Arrays;
  */
 public class Server {
     public static void main(String[] args) {
-        byte[] b = "GG".getBytes(StandardCharsets.UTF_8);
+        byte[] b = "GGGGGGGGGGGGGGGG".getBytes(StandardCharsets.UTF_8);
         long[] k = new long[]{1,2,3,4};
         System.out.println("Before: "  + Arrays.toString(b));
         System.loadLibrary("tea");
 
-        byte[] encrypted = TEA.do_encrypt(b, k);
+        byte[] encrypted = TEA.encrypt(b, k);
 
         System.out.println("After: " + Arrays.toString(encrypted));
-        byte[] decrypted = TEA.do_decrypt(encrypted, k);
+        byte[] decrypted = TEA.decrypt(encrypted, k);
         System.out.println("Finally: " + Arrays.toString(decrypted));
     }
 }

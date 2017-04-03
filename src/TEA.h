@@ -9,18 +9,18 @@ extern "C" {
 #endif
 /*
  * Class:     TEA
- * Method:    encrypt
+ * Method:    _encrypt
  * Signature: ([B[J)V
  */
-JNIEXPORT void JNICALL Java_TEA_encrypt
+JNIEXPORT void JNICALL Java_TEA__1encrypt
   (JNIEnv *, jclass, jbyteArray, jlongArray);
 
 /*
  * Class:     TEA
- * Method:    decrypt
+ * Method:    _decrypt
  * Signature: ([B[J)V
  */
-JNIEXPORT void JNICALL Java_TEA_decrypt
+JNIEXPORT void JNICALL Java_TEA__1decrypt
   (JNIEnv *, jclass, jbyteArray, jlongArray);
 
 #ifdef __cplusplus

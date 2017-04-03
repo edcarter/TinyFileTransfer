@@ -4,14 +4,14 @@
 public class TEA {
     private static int blockSize = 16;
 
-    public static byte[] do_encrypt(byte[] bytes, long[] key) {
+    public static byte[] encrypt(byte[] bytes, long[] key) {
         byte[] padded = pad(bytes);
-        encrypt(padded, key);
+        _encrypt(padded, key);
         return padded;
     }
 
-    public static byte[] do_decrypt(byte[] bytes, long[] key) {
-        decrypt(bytes, key);
+    public static byte[] decrypt(byte[] bytes, long[] key) {
+        _decrypt(bytes, key);
         byte[] unpadded = unpad(bytes);
         return unpadded;
     }
@@ -47,6 +47,6 @@ public class TEA {
         return unpadded;
     }
 
-    private static native void encrypt(byte[] bytes, long[] key);
-    private static native void decrypt(byte[] bytes, long[] key);
+    private static native void _encrypt(byte[] bytes, long[] key);
+    private static native void _decrypt(byte[] bytes, long[] key);
 }

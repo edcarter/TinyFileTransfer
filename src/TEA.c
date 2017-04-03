@@ -37,7 +37,7 @@ unsigned long delta=0x9e3779b9l;
 }
 
 
-JNIEXPORT void JNICALL Java_TEA_encrypt
+JNIEXPORT void JNICALL Java_TEA__1encrypt
   (JNIEnv *env, jclass o, jbyteArray b, jlongArray k) {
 	jboolean b_is_copy, k_is_copy;
 	jsize len = (*env)->GetArrayLength(env, b);
@@ -52,7 +52,7 @@ JNIEXPORT void JNICALL Java_TEA_encrypt
 	(*env)->ReleaseByteArrayElements(env, b, data, b_is_copy);
 }
 
-JNIEXPORT void JNICALL Java_TEA_decrypt
+JNIEXPORT void JNICALL Java_TEA__1decrypt
   (JNIEnv *env, jclass o, jbyteArray b, jlongArray k) {
 	jboolean b_is_copy, k_is_copy;
 	jsize len = (*env)->GetArrayLength(env, b);
