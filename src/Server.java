@@ -7,6 +7,7 @@ import java.net.Socket;
  */
 public class Server {
     public static void main(String[] args) {
+        System.loadLibrary("tea");
         int portNumber = Integer.parseInt(args[0]);
 
         // based off of https://docs.oracle.com/javase/tutorial/networking/sockets/clientServer.html

@@ -14,9 +14,9 @@ public class SecretNegotiator {
         try {
             OutputStream out = sock.getOutputStream();
             InputStream in = sock.getInputStream();
-            KeyAgreement keyAgreement = KeyAgreement.getInstance(ProtocolConstants.keyExchangeAlgorithm);
-            KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance(ProtocolConstants.keyExchangeAlgorithm);
-            keyGenerator.initialize(ProtocolConstants.keyExchangeHashSize);
+            KeyAgreement keyAgreement = KeyAgreement.getInstance(Protocol.keyExchangeAlgorithm);
+            KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance(Protocol.keyExchangeAlgorithm);
+            keyGenerator.initialize(Protocol.keyExchangeHashSize);
             KeyPair pair = keyGenerator.generateKeyPair();
             keyAgreement.init(pair.getPrivate());
             byte[] ourPublic = pair.getPublic().getEncoded();
@@ -31,8 +31,8 @@ public class SecretNegotiator {
             while ((read = in.read(keyBuf, read, keySizeBytes-read)) != -1) {
                 if (read == keySizeBytes) break;
             }
-            PublicKey publicKey = KeyFactory.getInstance(ProtocolConstants.keyExchangeAlgorithm)
-                    .generatePublic(new X509EncodedKeySpec(keyBuf));
+            PublicKey publicKey = KeyFactory.getInstance(Protocol.keyExchangeAlgorithm)
+                                            .generatePublic(new X509EncodedKeySpec(keyBuf));
             keyAgreement.doPhase(publicKey, true);
             return keyAgreement.generateSecret();
         } catch (Exception ex) {

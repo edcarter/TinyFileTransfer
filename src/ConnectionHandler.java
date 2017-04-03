@@ -1,13 +1,6 @@
-import javax.crypto.KeyAgreement;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PublicKey;
-import java.security.spec.X509EncodedKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 /**
  * Created by elias on 02/04/17.
@@ -23,24 +16,12 @@ class ConnectionHandler implements Runnable {
     @Override
     public void run() {
         try {
-            byte[] secret = SecretNegotiator.negotiateSecret(sock);
-            System.out.println(new String(secret));
-            /*
-            PrintWriter out = new PrintWriter(sock.getOutputStream(), true);
-            InputStream in = sock.getInputStream();
-            while (!sock.isClosed()) {
-                String encrypted = in.read;
-                String
-                String prefix = message.split(":")[0];
-                String postfix = message.split(":")[1];
-                switch (prefix) {
-                    case ProtocolConstants.finishMessage:
-                        return;
-                    case ProtocolConstants.fileRequestPrefix:
-                        System.out.println()
-                }
-            }*/
-        } catch (Exception ex) {
-        }
+            Protocol p = new Protocol(sock);
+            ArrayList<Byte> buf = new ArrayList<>();
+            String header = p.GetMessage(buf);
+            byte[] buf2 = new byte[buf.size()];
+            for (int i = 0; i < buf.size(); i++) buf2[i] = buf.get(i);
+            System.out.println("Recieved: " + new String(buf2, StandardCharsets.UTF_8));
+        } catch (Exception ex) { }
     }
 }

@@ -1,8 +1,4 @@
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.Key;
 import java.net.Socket;
 
 /**
@@ -10,6 +6,7 @@ import java.net.Socket;
  */
 public class Client {
     public static void main(String[] args) {
+        System.loadLibrary("tea");
         String serverName = args[0];
         int port = Integer.parseInt(args[1]);
         try {
@@ -17,8 +14,9 @@ public class Client {
             Socket client = new Socket(serverName, port);
 
             System.out.println("Just connected to " + client.getRemoteSocketAddress());
-            byte[] secret = SecretNegotiator.negotiateSecret(client);
-            System.out.println(new String(secret));
+            Protocol p = new Protocol(client);
+            p.AuthenticateUser("edcarter", "mypass");
+            p.CloseSession();
             client.close();
         }catch(IOException e) {
             e.printStackTrace();
