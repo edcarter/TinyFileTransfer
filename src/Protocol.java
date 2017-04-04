@@ -19,7 +19,7 @@ public class Protocol {
     public static final String finishMessage = "finish:finish";
     public static final String authenticatePrefix = "auth:";
 
-    public static final String authenticationSeparator = "jasdfj2104812hdfasoduf:a;sdlfj";
+    public static final String authenticationSeparator = "::";
 
     private Socket sock;
     private long[] sharedKey;
@@ -30,8 +30,13 @@ public class Protocol {
         // convert to long array
         ByteBuffer byteBuffer = ByteBuffer.wrap(bSharedKey);
         LongBuffer longBuffer = byteBuffer.asLongBuffer();
-        sharedKey = new long[longBuffer.capacity()];
-        longBuffer.get(sharedKey);
+        long[] longKey = new long[longBuffer.capacity()];
+        longBuffer.get(longKey);
+        sharedKey = new long[4];
+        sharedKey[0] = longKey[0];
+        sharedKey[1] = longKey[1];
+        sharedKey[2] = longKey[2];
+        sharedKey[3] = longKey[3];
     }
 
     public void AuthenticateUser(String userName, String password) {
@@ -67,6 +72,7 @@ public class Protocol {
     // Fill message buffer and return the header
     public String GetMessage(ArrayList<Byte> message) {
         byte[] data = ReadData();
+        System.out.println("GetMessage: " + new String(data, StandardCharsets.UTF_8));
         byte separator = ':';
         int separatorIndex;
         for (separatorIndex = 0; data[separatorIndex] != separator; separatorIndex++) {}
@@ -93,8 +99,9 @@ public class Protocol {
             while ((read = in.read(buf, read, dataLength-read)) != -1) {
                 if (read == dataLength) break;
             }
-            //TEA.decrypt(buf, sharedKey); //TODO
-            return buf;
+            System.out.println("recieved length: " +dataLength);
+            PrintBytes("Recieved encryped bytes: ", buf);
+            return TEA.decrypt(buf, sharedKey); //TODO
         } catch (IOException ex) {}
         return null;
     }
@@ -105,16 +112,24 @@ public class Protocol {
 
     private void SendEncryptedData(byte[] bytes) {
         // append message length header
-        byte[] messageLength = ByteBuffer.allocate(4).putInt(bytes.length).array();
-        byte[] both = new byte[messageLength.length + bytes.length];
-        //TEA.encrypt(bytes, sharedKey); //TODO
-        System.out.println("encrypted: " + new String(bytes));
+        byte[] encrypted = TEA.encrypt(bytes, sharedKey); //
+        byte[] messageLength = ByteBuffer.allocate(4).putInt(encrypted.length).array();
+        byte[] both = new byte[messageLength.length + encrypted.length];
+
+        System.out.println("encrypted: " + new String(encrypted));
         for (int i = 0; i<both.length; i++) {
             if (i < messageLength.length) both[i] = messageLength[i]; // copy message length
-            else both[i] = bytes[i-messageLength.length]; // otherwise copy message
+            else both[i] = encrypted[i-messageLength.length]; // otherwise copy message
         }
         try {
             sock.getOutputStream().write(both);
         } catch (IOException ex) {}
+        System.out.println("message Length: " + encrypted.length);
+        PrintBytes("Sent Encrypted: ", encrypted);
+    }
+
+    private void PrintBytes(String prefix, byte[] bytes) {
+        System.out.println(prefix);
+        for (byte b : bytes) System.out.println(b);
     }
 }
