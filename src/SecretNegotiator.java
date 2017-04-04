@@ -20,8 +20,8 @@ public class SecretNegotiator {
             KeyPair pair = keyGenerator.generateKeyPair();
             keyAgreement.init(pair.getPrivate());
             byte[] ourPublic = pair.getPublic().getEncoded();
-            byte[] outPublicLength = ByteBuffer.allocate(4).putInt(ourPublic.length).array();
-            out.write(outPublicLength);
+            byte[] ourPublicLength = ByteBuffer.allocate(4).putInt(ourPublic.length).array();
+            out.write(ourPublicLength);
             out.write(ourPublic);
             int read = 0;
             byte[] lengthBuf = new byte[4];
