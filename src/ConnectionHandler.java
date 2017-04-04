@@ -58,11 +58,6 @@ class ConnectionHandler implements Runnable {
         } else {
             response = "ERR";
         }
-        /*if (userName.equals("edcarter") && passWord.equals("mypass")) {
-            response = "OK";
-        } else {
-            response = "ERR";
-        }*/
         p.AuthenticationResponse(response);
         try {
             if (response.equals("ERR")) sock.close();
@@ -75,6 +70,7 @@ class ConnectionHandler implements Runnable {
         Path path = Paths.get(location);
         if (!Files.exists(path)) {
             p.SendError("File not found: " + path);
+            return;
         }
         try {
             byte[] file = Files.readAllBytes(path);
