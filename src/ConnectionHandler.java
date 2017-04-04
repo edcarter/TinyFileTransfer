@@ -14,11 +14,13 @@ class ConnectionHandler implements Runnable {
     private Socket sock;
     private Protocol p;
     private String fileDir;
+    private Shadow shadow;
 
 
     ConnectionHandler(Socket sock, String fileDir) {
         this.sock = sock;
         this.fileDir = fileDir;
+        this.shadow = new Shadow();
     }
 
     @Override
@@ -50,11 +52,17 @@ class ConnectionHandler implements Runnable {
         String userName = str.split(Protocol.authenticationSeparator)[0];
         String passWord = str.split(Protocol.authenticationSeparator)[1];
         String response;
-        if (userName.equals("edcarter") && passWord.equals("mypass")) {
+        boolean validUser = shadow.Authenticate(userName, passWord);
+        if (validUser) {
             response = "OK";
         } else {
             response = "ERR";
         }
+        /*if (userName.equals("edcarter") && passWord.equals("mypass")) {
+            response = "OK";
+        } else {
+            response = "ERR";
+        }*/
         p.AuthenticationResponse(response);
         try {
             if (response.equals("ERR")) sock.close();
