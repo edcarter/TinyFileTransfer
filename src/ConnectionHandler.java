@@ -1,5 +1,3 @@
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -7,20 +5,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.io.File;
 
 /**
  * Created by elias on 02/04/17.
  */
 class ConnectionHandler implements Runnable {
 
-    Socket sock;
-    Protocol p;
-    String fileDir = "/home/elias/TinyFileTransfer/src/";
+    private Socket sock;
+    private Protocol p;
+    private String fileDir;
 
 
-    ConnectionHandler(Socket sock) {
+    ConnectionHandler(Socket sock, String fileDir) {
         this.sock = sock;
+        this.fileDir = fileDir;
     }
 
     @Override
@@ -58,6 +56,9 @@ class ConnectionHandler implements Runnable {
             response = "ERR";
         }
         p.AuthenticationResponse(response);
+        try {
+            if (response.equals("ERR")) sock.close();
+        } catch (IOException ex) {}
     }
 
     private void handleFileRequest(ArrayList<Byte> data) {

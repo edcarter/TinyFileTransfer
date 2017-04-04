@@ -9,6 +9,7 @@ public class Server {
     public static void main(String[] args) {
         //System.loadLibrary("tea"); //TODO
         int portNumber = Integer.parseInt(args[0]);
+        String fileDirectory = args[1];
 
         // based off of https://docs.oracle.com/javase/tutorial/networking/sockets/clientServer.html
         try {
@@ -16,7 +17,7 @@ public class Server {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("accepted connection from client");
-                ConnectionHandler h = new ConnectionHandler(clientSocket);
+                ConnectionHandler h = new ConnectionHandler(clientSocket, fileDirectory);
                 Thread t = new Thread(h);
                 t.start();
             }

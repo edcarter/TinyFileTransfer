@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * Created by elias on 03/04/17.
@@ -20,21 +21,39 @@ public class Client {
 
             System.out.println("Just connected to " + client.getRemoteSocketAddress());
             Protocol p = new Protocol(client);
-            p.AuthenticateUser("edcarter", "mypass");
+
+            Scanner reader = new Scanner(System.in);
+            System.out.println("Enter a username: ");
+            String userName = reader.next();
+
+            System.out.println("Password: ");
+            String passWord = reader.next();
+
+            p.AuthenticateUser(userName, passWord);
             ArrayList<Byte> buf = new ArrayList<>();
             String header = p.GetMessage(buf);
             byte[] bytes = toByteArray(buf);
+            if ("ERR".equals(new String(bytes, StandardCharsets.UTF_8))) {
+                System.out.println("Error authenticating.");
+                return;
+            }
             System.out.println("recieved: " + new String(bytes, StandardCharsets.UTF_8));
 
+            while (true) {
+                System.out.println("Enter file name or 'EXIT': ");
+                String response = reader.next();
+                if (response.equals("EXIT")) {
+                    break;
+                }
+                p.RequestFile(response);
+                buf = new ArrayList<>();
+                header = p.GetMessage(buf);
+                bytes = toByteArray(buf);
+                System.out.println("recieved: " + new String(bytes, StandardCharsets.UTF_8));
 
-            p.RequestFile("gggggggg");
-            buf = new ArrayList<>();
-            header = p.GetMessage(buf);
-            bytes = toByteArray(buf);
-            System.out.println("recieved: " + new String(bytes, StandardCharsets.UTF_8));
-
-            Path path = Paths.get("client_file");
-            Files.write(path, bytes);
+                Path path = Paths.get(response);
+                Files.write(path, bytes);
+            }
             p.CloseSession();
             client.close();
         }catch(IOException e) {
