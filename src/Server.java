@@ -18,7 +18,7 @@ public class Server {
             ServerSocket serverSocket = new ServerSocket(portNumber);
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("accepted connection from client");
+                System.out.println("Accepted connection from client: " + clientSocket.getRemoteSocketAddress());
                 ConnectionHandler h = new ConnectionHandler(clientSocket, fileDirectory);
                 Thread t = new Thread(h);
                 t.start();

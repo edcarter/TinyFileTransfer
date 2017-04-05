@@ -30,7 +30,6 @@ class ConnectionHandler implements Runnable {
             while (!sock.isClosed()) {
                 ArrayList<Byte> buf = new ArrayList<>();
                 String header = p.GetMessage(buf);
-                System.out.println(header);
                 switch (header) {
                     case Protocol.authenticatePrefix:
                         handleAuthentication(buf);
@@ -40,10 +39,12 @@ class ConnectionHandler implements Runnable {
                         break;
                     case Protocol.finishMessage:
                         sock.close();
+                        System.out.println("Connection finished by client");
                         return;
                 }
             }
         } catch (Exception ex) { }
+        System.out.println("Connection closed: " + sock.getRemoteSocketAddress());
     }
 
     private void handleAuthentication(ArrayList<Byte> data) {
