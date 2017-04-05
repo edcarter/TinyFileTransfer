@@ -28,7 +28,6 @@ public class Shadow {
                 if (!username.equals(userName)) continue; // check that we have entry for our user
 
                 byte[] saltedPassword = Salt(passWord, salt);
-                byte[] h = hash.getBytes(StandardCharsets.UTF_8);
                 byte[] computedHash = Hash(saltedPassword, hashKey);
                 return VerifyHash(hash, new String(computedHash, StandardCharsets.UTF_8));
             }
