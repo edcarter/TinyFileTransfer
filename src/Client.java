@@ -49,7 +49,7 @@ public class Client {
                 buf = new ArrayList<>();
                 header = p.GetMessage(buf);
                 bytes = toByteArray(buf);
-                System.out.println("recieved: " + new String(bytes, StandardCharsets.UTF_8));
+                //System.out.println("recieved: " + new String(bytes, StandardCharsets.UTF_8));
 
                 Path path = Paths.get(response);
                 Files.write(path, bytes);
