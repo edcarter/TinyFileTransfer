@@ -30,29 +30,39 @@ public class Client {
             String passWord = reader.next();
 
             p.AuthenticateUser(userName, passWord);
-            ArrayList<Byte> buf = new ArrayList<>();
-            String header = p.GetMessage(buf);
-            byte[] bytes = toByteArray(buf);
-            if ("ERR".equals(new String(bytes, StandardCharsets.UTF_8))) {
-                System.out.println("Error authenticating.");
-                return;
-            }
-            System.out.println("recieved: " + new String(bytes, StandardCharsets.UTF_8));
 
-            while (true) {
+            String response = null;
+            while (!client.isClosed()) {
+                ArrayList<Byte> buf = new ArrayList<>();
+                String header = p.GetMessage(buf);
+                byte[] bytes = toByteArray(buf);
+
+                switch (header) {
+                    case Protocol.authenticatePrefix:
+                        String authenticationResponse = new String(bytes, StandardCharsets.UTF_8);
+                        if (authenticationResponse.equals("ERR")) {
+                            System.out.println("Error authenticating");
+                            return;
+                        }
+                        break;
+                    case Protocol.fileRequestPrefix:
+                        Path path = Paths.get(response);
+                        Files.write(path, bytes);
+                        break;
+                    case Protocol.finishMessage:
+                        System.out.println("Server terminated connection");
+                        return;
+                    case Protocol.errorPrefix:
+                        String errorMessage = new String(bytes, StandardCharsets.UTF_8);
+                        System.out.println("Error from server: " + errorMessage);
+                        break;
+                }
                 System.out.println("Enter file name or 'EXIT': ");
-                String response = reader.next();
+                response = reader.next();
                 if (response.equals("EXIT")) {
                     break;
                 }
                 p.RequestFile(response);
-                buf = new ArrayList<>();
-                header = p.GetMessage(buf);
-                bytes = toByteArray(buf);
-                //System.out.println("recieved: " + new String(bytes, StandardCharsets.UTF_8));
-
-                Path path = Paths.get(response);
-                Files.write(path, bytes);
             }
             p.CloseSession();
             client.close();

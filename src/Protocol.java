@@ -15,7 +15,7 @@ class Protocol {
     static final int    keyExchangeHashSize = 1024;
 
     static final String fileRequestPrefix = "file:";
-    private static final String errorPrefix = "error:";
+    static final String errorPrefix = "error:";
     static final String finishMessage = "finish:finish";
     static final String authenticatePrefix = "auth:";
 
