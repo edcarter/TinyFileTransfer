@@ -21,6 +21,11 @@ class Protocol {
 
     static final String authenticationSeparator = "::";
 
+    /* 100 MB max file size, since we are loading
+       whole files into memory, it is unwise to try to load
+       100+ MB files into memory */
+    static final int maxFileSize = 100000000;
+
     private Socket sock;
     private long[] sharedKey;
 

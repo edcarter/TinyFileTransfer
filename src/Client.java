@@ -12,7 +12,6 @@ import java.util.Scanner;
  */
 public class Client {
     public static void main(String[] args) {
-        System.loadLibrary("tea");
         String serverName = args[0];
         int port = Integer.parseInt(args[1]);
         try {

@@ -16,7 +16,6 @@ class ConnectionHandler implements Runnable {
     private String fileDir;
     private Shadow shadow;
 
-
     ConnectionHandler(Socket sock, String fileDir) {
         this.sock = sock;
         this.fileDir = fileDir;
@@ -76,6 +75,10 @@ class ConnectionHandler implements Runnable {
             return;
         }
         try {
+            if (Files.size(path) > Protocol.maxFileSize) {
+                p.SendError("File too large, size greater than: " + Protocol.maxFileSize + "MB");
+                return;
+            }
             byte[] file = Files.readAllBytes(path);
             p.SendFile(file);
         } catch (IOException ex) {

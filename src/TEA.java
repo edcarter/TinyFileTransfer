@@ -2,6 +2,12 @@
  * Created by elias on 30/03/17.
  */
 public class TEA {
+
+    static {
+        // load shared library libtea.so for native encryption methods
+        System.loadLibrary("tea");
+    }
+
     private static int blockSize = 16;
 
     public static byte[] encrypt(byte[] bytes, long[] key) {

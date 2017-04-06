@@ -7,7 +7,6 @@ import java.net.Socket;
  */
 public class Server {
     public static void main(String[] args) {
-        System.loadLibrary("tea"); //TODO
         int portNumber = Integer.parseInt(args[0]);
         String fileDirectory = args[1];
         Shadow s = new Shadow();
