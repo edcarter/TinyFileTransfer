@@ -27,15 +27,23 @@ public class SecretNegotiator {
         try {
             OutputStream out = sock.getOutputStream();
             InputStream in = sock.getInputStream();
+
             KeyAgreement keyAgreement = KeyAgreement.getInstance(keyExchangeAlgorithm);
             KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance(keyExchangeAlgorithm);
+
             keyGenerator.initialize(keyExchangeHashSize);
             KeyPair pair = keyGenerator.generateKeyPair();
+
+            // pass our private key to the diffie-hellman algorithm
             keyAgreement.init(pair.getPrivate());
+
+            // write our public key
             byte[] ourPublic = pair.getPublic().getEncoded();
             byte[] ourPublicLength = ByteBuffer.allocate(4).putInt(ourPublic.length).array();
             out.write(ourPublicLength);
             out.write(ourPublic);
+
+            // read other parties public key
             int read = 0;
             byte[] lengthBuf = new byte[4];
             in.read(lengthBuf, 0, 4);
@@ -46,7 +54,11 @@ public class SecretNegotiator {
             }
             PublicKey publicKey = KeyFactory.getInstance(keyExchangeAlgorithm)
                                             .generatePublic(new X509EncodedKeySpec(keyBuf));
+
+            // mix our private and other parties public key
             keyAgreement.doPhase(publicKey, true);
+
+            // generate our shared secret
             return keyAgreement.generateSecret();
         } catch (Exception ex) {
             throw new RuntimeException(ex);
