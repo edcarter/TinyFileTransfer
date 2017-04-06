@@ -31,7 +31,7 @@ public class Shadow {
                 byte[] computedHash = Hash(saltedPassword, hashKey);
                 return VerifyHash(hash, new String(computedHash, StandardCharsets.UTF_8));
             }
-        } catch (IOException ex) { }
+        } catch (IOException ex) { /* bad voodoo, meh, java shouldn't have checked exceptions */ }
         return false;
     }
 
