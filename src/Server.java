@@ -10,7 +10,7 @@ public class Server {
         int portNumber = Integer.parseInt(args[0]);
         String fileDirectory = args[1];
         Shadow s = new Shadow();
-        s.CreateDummyShadow();
+        createDummyShadow(s);
 
         // based off of https://docs.oracle.com/javase/tutorial/networking/sockets/clientServer.html
         try {
@@ -25,5 +25,11 @@ public class Server {
         } catch (IOException ex) {
             System.out.println("IOException: " + ex.getMessage());
         }
+    }
+
+    private static void createDummyShadow(Shadow s) {
+        s.EraseShadowFile();
+        s.AddUser("edcarter", "mypass");
+        s.AddUser("user2", "pass2");
     }
 }

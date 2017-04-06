@@ -1,7 +1,10 @@
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.security.SecureRandom;
 import java.util.List;
 
 /**
@@ -11,9 +14,12 @@ public class Shadow {
     private static String shadowFile = "shadow";
     private static final String shadowFileDelim = "::";
     private static final long[] hashKey = new long[]{841609575, 503076106, 935458534, -550565543};
+    private static final int saltSize = 130; // 130 bits
+    private SecureRandom saltGenerator;
+
 
     public Shadow() {
-
+        saltGenerator = new SecureRandom();
     }
 
     /**
@@ -43,18 +49,34 @@ public class Shadow {
         return false;
     }
 
-    public void CreateDummyShadow() {
-        String username = "edcarter";
-        String pass = "mypass";
-        String salt = "8sdfgjaksdfawasndfkasld";
+    /**
+     * Add user to shadow file
+     * @param username user's name
+     * @param pass user's password
+     */
+    public void AddUser(String username, String pass) {
+        String salt = new BigInteger(saltSize, saltGenerator).toString(32 /* base 32 encoding */);
         byte[] saltedPass = Salt(pass, salt);
         byte[] hashedPass = Hash(saltedPass, hashKey);
         String hashedPassString = new String(hashedPass, Protocol.protocolEncoding);
-        String entry = username + shadowFileDelim + salt + shadowFileDelim + hashedPassString;
+        String entry = username + shadowFileDelim + salt + shadowFileDelim + hashedPassString + '\n';
 
         Path path = Paths.get(shadowFile);
         try {
-            Files.write(path, entry.getBytes(Protocol.protocolEncoding));
+            if (!Files.exists(path)) Files.createFile(path);
+            Files.write(path, entry.getBytes(Protocol.protocolEncoding), StandardOpenOption.APPEND);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    /**
+     * Erase the shadow file
+     */
+    public void EraseShadowFile() {
+        Path path = Paths.get(shadowFile);
+        try {
+            if (Files.exists(path)) Files.delete(path);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
