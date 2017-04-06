@@ -24,7 +24,7 @@ public class Shadow {
 
     /**
      * Authenticate that username exists in shadow file and
-     * that he password and salt hash to the saved hash value.
+     * that the password and salt hash to the saved hash value.
      * @param userName
      * @param passWord
      * @return whether user is authenticated
