@@ -90,7 +90,7 @@ class ConnectionHandler implements Runnable {
         }
         try {
             if (Files.size(path) > Protocol.maxFileSize) {
-                p.SendError("File too large, size greater than: " + Protocol.maxFileSize + "MB");
+                p.SendError("File too large, size greater than: " + Protocol.maxFileSize + " Bytes");
                 return;
             }
             byte[] file = Files.readAllBytes(path);
