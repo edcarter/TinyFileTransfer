@@ -66,8 +66,8 @@ public class Client {
             }
             p.CloseSession();
             sock.close();
-        }catch(IOException e) {
-            e.printStackTrace();
+        }catch(IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
 

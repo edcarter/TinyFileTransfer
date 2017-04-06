@@ -62,7 +62,9 @@ class ConnectionHandler implements Runnable {
         p.AuthenticationResponse(response);
         try {
             if (response.equals("ERR")) sock.close();
-        } catch (IOException ex) {}
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private void handleFileRequest(ArrayList<Byte> data) {

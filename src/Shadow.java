@@ -31,7 +31,9 @@ public class Shadow {
                 byte[] computedHash = Hash(saltedPassword, hashKey);
                 return VerifyHash(hash, new String(computedHash, StandardCharsets.UTF_8));
             }
-        } catch (IOException ex) { /* bad voodoo, meh, java shouldn't have checked exceptions */ }
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
         return false;
     }
 
@@ -47,7 +49,9 @@ public class Shadow {
         Path path = Paths.get(shadowFile);
         try {
             Files.write(path, entry.getBytes(StandardCharsets.UTF_8));
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private byte[] Salt(String s, String salt) {

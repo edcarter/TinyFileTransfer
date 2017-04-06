@@ -1,4 +1,5 @@
 import javax.crypto.KeyAgreement;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -36,8 +37,7 @@ public class SecretNegotiator {
             keyAgreement.doPhase(publicKey, true);
             return keyAgreement.generateSecret();
         } catch (Exception ex) {
-            System.out.println("Exception in negotiateSecret: " + ex.getMessage());
+            throw new RuntimeException(ex);
         }
-        return null;
     }
 }

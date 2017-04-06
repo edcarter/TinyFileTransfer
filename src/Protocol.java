@@ -96,12 +96,13 @@ class Protocol {
             byte[] buf = new byte[dataLength];
             int read = 0;
 
-            while ((read = in.read(buf, read, dataLength-read)) != -1) {
+            while ((read += in.read(buf, read, dataLength-read)) != -1) {
                 if (read == dataLength) break;
             }
             return TEA.decrypt(buf, sharedKey);
-        } catch (IOException ex) {}
-        return null;
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public void CloseSession() {
@@ -119,7 +120,9 @@ class Protocol {
         }
         try {
             sock.getOutputStream().write(both);
-        } catch (IOException ex) {}
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private void PrintBytes(String prefix, byte[] bytes) {
