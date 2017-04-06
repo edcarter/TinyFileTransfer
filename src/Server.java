@@ -3,7 +3,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- * Created by elias on 30/03/17.
+ * Server main class
  */
 public class Server {
     public static void main(String[] args) {

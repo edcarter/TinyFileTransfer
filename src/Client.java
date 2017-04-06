@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * Created by elias on 03/04/17.
+ * Client main class
  */
 public class Client {
     public static void main(String[] args) {
@@ -31,6 +31,8 @@ public class Client {
             p.AuthenticateUser(userName, passWord);
 
             String response = null;
+
+            // main message handling loop
             while (!sock.isClosed()) {
                 ArrayList<Byte> buf = new ArrayList<>();
                 String header = p.GetMessage(buf);

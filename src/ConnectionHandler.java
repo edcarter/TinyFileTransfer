@@ -1,13 +1,12 @@
 import java.io.IOException;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
- * Created by elias on 02/04/17.
+ * A handler which is launched for each client connection
  */
 class ConnectionHandler implements Runnable {
 
@@ -16,6 +15,11 @@ class ConnectionHandler implements Runnable {
     private String fileDir;
     private Shadow shadow;
 
+    /**
+     * CTOR
+     * @param sock socket connected to client
+     * @param fileDir directory from where the requested files are fetched
+     */
     ConnectionHandler(Socket sock, String fileDir) {
         this.sock = sock;
         this.fileDir = fileDir;
@@ -26,6 +30,8 @@ class ConnectionHandler implements Runnable {
     public void run() {
         try {
             p = new Protocol(sock);
+
+            // main message handling loop
             while (!sock.isClosed()) {
                 ArrayList<Byte> buf = new ArrayList<>();
                 String header = p.GetMessage(buf);
@@ -46,9 +52,13 @@ class ConnectionHandler implements Runnable {
         System.out.println("Connection closed: " + sock.getRemoteSocketAddress());
     }
 
+    /**
+     * Handle authentication request from client
+     * @param data
+     */
     private void handleAuthentication(ArrayList<Byte> data) {
         byte[] buf = toByteArray(data);
-        String str = new String(buf, StandardCharsets.UTF_8);
+        String str = new String(buf, Protocol.protocolEncoding);
         String userName = str.split(Protocol.authenticationSeparator)[0];
         String passWord = str.split(Protocol.authenticationSeparator)[1];
         String response;
@@ -66,9 +76,13 @@ class ConnectionHandler implements Runnable {
         }
     }
 
+    /**
+     * Handle file request from client
+     * @param data
+     */
     private void handleFileRequest(ArrayList<Byte> data) {
         byte[] buf = toByteArray(data);
-        String location = fileDir + new String(buf, StandardCharsets.UTF_8);
+        String location = fileDir + new String(buf, Protocol.protocolEncoding);
         Path path = Paths.get(location);
         if (!Files.exists(path)) {
             p.SendError("File not found: " + path);
@@ -86,6 +100,12 @@ class ConnectionHandler implements Runnable {
         }
     }
 
+    /**
+     * Helper method to convert an arrayList of Bytes
+     * to a byte array
+     * @param buf byte arrayList
+     * @return byte array
+     */
     private byte[] toByteArray(ArrayList<Byte> buf) {
         byte[] buf2 = new byte[buf.size()];
         for (int i = 0; i < buf.size(); i++) buf2[i] = buf.get(i);

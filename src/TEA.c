@@ -36,7 +36,12 @@ unsigned long delta=0x9e3779b9l;
 	v[1] = z;
 }
 
-
+/*
+ * Native method for encrypting bytes in place.
+ * The byte array size must be a multiple of 16 since the encryption is done
+ * 2 longs at a time. The longarray key must be atleast 4 elements in length,
+ * any elements after the 4th are ignored.
+ */
 JNIEXPORT void JNICALL Java_TEA__1encrypt
   (JNIEnv *env, jclass o, jbyteArray b, jlongArray k) {
 	jboolean b_is_copy, k_is_copy;
@@ -52,6 +57,12 @@ JNIEXPORT void JNICALL Java_TEA__1encrypt
 	(*env)->ReleaseByteArrayElements(env, b, data, b_is_copy);
 }
 
+/*
+ * Native method for decrypting bytes in place.
+ * The byte array size must be a multiple of 16 since the encryption is done
+ * 2 longs at a time. The longarray key must be atleast 4 elements in length,
+ * any elements after the 4th are ignored.
+ */
 JNIEXPORT void JNICALL Java_TEA__1decrypt
   (JNIEnv *env, jclass o, jbyteArray b, jlongArray k) {
 	jboolean b_is_copy, k_is_copy;

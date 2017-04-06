@@ -3,28 +3,36 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 /**
- * Created by elias on 02/04/17.
+ * Protocol for communicating over an encrypted socket
  */
 class Protocol {
 
-    static final String keyExchangeAlgorithm = "DiffieHellman";
-    static final int    keyExchangeHashSize = 1024;
-
+    /**
+     * Message Headers
+     */
     static final String fileRequestPrefix = "file:";
     static final String errorPrefix = "error:";
     static final String finishMessage = "finish:finish";
     static final String authenticatePrefix = "auth:";
 
+    /**
+     * Separator for username and password in authentication method
+     */
     static final String authenticationSeparator = "::";
 
-    /* 100 MB max file size, since we are loading
-       whole files into memory, it is unwise to try to load
-       100+ MB files into memory */
+    /**
+     * 100 MB max file size, since we are loading
+     * whole files into memory, it is unwise to try to load
+     * 100+ MB files into memory
+     */
     static final int maxFileSize = 100000000;
+
+    static final Charset protocolEncoding = StandardCharsets.UTF_8;
 
     private Socket sock;
     private long[] sharedKey;
@@ -45,23 +53,40 @@ class Protocol {
         sharedKey[3] = longKey[3];
     }
 
+    /**
+     * Send authentication information to server
+     * @param userName
+     * @param password
+     */
     void AuthenticateUser(String userName, String password) {
         String message = authenticatePrefix + userName + authenticationSeparator + password;
-        SendEncryptedData(message.getBytes(StandardCharsets.UTF_8));
+        SendEncryptedData(message.getBytes(protocolEncoding));
     }
 
+    /**
+     * Send file request to server
+     * @param filePath
+     */
     void RequestFile(String filePath) {
         String message = fileRequestPrefix + filePath;
-        SendEncryptedData(message.getBytes(StandardCharsets.UTF_8));
+        SendEncryptedData(message.getBytes(protocolEncoding));
     }
 
+    /**
+     * Send error message to other party
+     * @param error
+     */
     void SendError(String error) {
         String message = errorPrefix + error;
-        SendEncryptedData(message.getBytes(StandardCharsets.UTF_8));
+        SendEncryptedData(message.getBytes(protocolEncoding));
     }
 
+    /**
+     * Send file to client
+     * @param file
+     */
     void SendFile(byte[] file) {
-        byte[] encodedPrefix = fileRequestPrefix.getBytes(StandardCharsets.UTF_8);
+        byte[] encodedPrefix = fileRequestPrefix.getBytes(protocolEncoding);
         byte[] data = new byte[encodedPrefix.length + file.length];
         for (int i = 0; i < data.length; i++) {
             if (i < encodedPrefix.length) data[i] = encodedPrefix[i];
@@ -70,12 +95,27 @@ class Protocol {
         SendEncryptedData(data);
     }
 
+    /**
+     * Send authentication response to client
+     * @param response
+     */
     void AuthenticationResponse(String response) {
         String message = authenticatePrefix + response;
-        SendEncryptedData(message.getBytes(StandardCharsets.UTF_8));
+        SendEncryptedData(message.getBytes(protocolEncoding));
     }
 
-    // Fill message buffer and return the header
+    /**
+     * Send a close session message to other party
+     */
+    public void CloseSession() {
+        SendEncryptedData(finishMessage.getBytes(protocolEncoding));
+    }
+
+    /**
+     * Get a message from the other party
+     * @param message buffer to fill message data with
+     * @return message header
+     */
     String GetMessage(ArrayList<Byte> message) {
         byte[] data = ReadData();
         byte separator = ':';
@@ -84,14 +124,16 @@ class Protocol {
         byte[] header = new byte[separatorIndex+1];
         // copy header bytes into array
         for (int i = 0; i <= separatorIndex; i++) header[i] = data[i];
-        String h = new String(header, StandardCharsets.UTF_8);
+        String h = new String(header, protocolEncoding);
         // copy message
         for (int i = separatorIndex + 1; i < data.length; i++) message.add(data[i]);
         return h;
     }
 
-    // Read Length Header and then return byte buffer containing
-    // the number of bytes specified in the length header
+    /**
+     * Get unencrypted raw message byte data from other party
+     * @return
+     */
     private byte[] ReadData() {
         try {
             InputStream in = sock.getInputStream();
@@ -110,10 +152,10 @@ class Protocol {
         }
     }
 
-    public void CloseSession() {
-        SendEncryptedData(finishMessage.getBytes(StandardCharsets.UTF_8));
-    }
-
+    /**
+     * Encrypt bytes and then send it to the other party
+     * @param bytes message to encrypt and send
+     */
     private void SendEncryptedData(byte[] bytes) {
         byte[] encrypted = TEA.encrypt(bytes, sharedKey);
         byte[] messageLength = ByteBuffer.allocate(4).putInt(encrypted.length).array();
@@ -128,10 +170,5 @@ class Protocol {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-    }
-
-    private void PrintBytes(String prefix, byte[] bytes) {
-        System.out.println(prefix);
-        for (byte b : bytes) System.out.println(b);
     }
 }
