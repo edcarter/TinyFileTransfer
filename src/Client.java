@@ -26,7 +26,7 @@ public class Client {
             String userName = reader.next();
 
             System.out.println("Password: ");
-            String passWord = reader.next();
+            String passWord = new String(System.console().readPassword());
 
             p.AuthenticateUser(userName, passWord);
 
